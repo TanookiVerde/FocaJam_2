@@ -21,6 +21,11 @@ public class GameManager : MonoBehaviour {
 
     [SerializeField] private Text gameState;
 
+    [SerializeField] private GameObject p1Icon, p2Icon;
+    [SerializeField] private Color[] colorOptions;
+
+    [SerializeField] private AudioSource[] audioSrcs;
+
     private bool ended;
     private int currentRound;
     private int[] playersScore = {0,0};
@@ -30,12 +35,7 @@ public class GameManager : MonoBehaviour {
 		mapCreator.InitializeMap();
         StartCoroutine(GameLoop());
     }
-    private void Update() {
-        if (Input.GetKeyDown("1")) {
-            characters[0].GetComponent<SpriteRenderer>().color = Color.blue;
-            characters[1].GetComponent<SpriteRenderer>().color = Color.red;
-        }
-    }
+
     private void InitializeRound(){
         for(int i = characters.Count-1; i > 0; i--){
             Destroy(characters[i]);
@@ -86,6 +86,18 @@ public class GameManager : MonoBehaviour {
             //animacao final rounds - com ganhador
         }
     }
+    private Vector2 GetSpawnPoint(){
+        var map = mapCreator.map;
+        List<Vector2> list = new List<Vector2>();
+        for(int x = 0; x < 10; x++){
+            for(int y = 0; y < 10; y++){
+                if(map[x,y] == 0){
+                    list.Add(new Vector2(x,y));
+                }
+            }
+        }
+        return list[Random.Range(0,list.Count)];
+    }
     private IEnumerator WaitForPlayerInput(int playerId){
         Vector2 dir = Vector2.zero;
         Character character = characters[playerId].GetComponent<Character>();
@@ -94,6 +106,7 @@ public class GameManager : MonoBehaviour {
         while (!Input.GetKeyDown(KeyCode.Return)){
             if (Input.GetKeyDown(KeyCode.Space)) {
                 if (character.hasBullet) {
+                    audioSrcs[1].Play();
                     gameState.text = "Player " + playerId + ": select direction";
                     shallShoot[playerId] = true;
                     yield return GetShootDirection(playerId);
@@ -109,6 +122,7 @@ public class GameManager : MonoBehaviour {
             }
             yield return null;
         }
+        audioSrcs[0].Play();
         Vector2 newPos = character.position + dir;
         AddOnDictionary(newPos,characters[playerId]);
         yield return new WaitWhile(() => Input.GetKeyDown(KeyCode.Return));
@@ -170,7 +184,6 @@ public class GameManager : MonoBehaviour {
         for(int i = 0; i < mapCreator.size && !hit; i++) {
             bulletPos += direction;
             for(int j = 0; j < characters.Count; j++){
-                Debug.Log("bulletPos: " + bulletPos);
                 if (bulletPos == characters[j].GetComponent<Character>().position) {
                     characters[j].GetComponent<Character>().Die();
                     if(j <= 2){
@@ -207,8 +220,9 @@ public class GameManager : MonoBehaviour {
 		}
     }
     private void InitializeCharacters(){
-        int x = Random.Range(2, 8);
-        int y = Random.Range(2, 8);
+        Vector2 pos = GetSpawnPoint();
+        int x = (int)pos.x;
+        int y = (int)pos.y;
         float tileSize = mapCreator.tileSize;
         float size = mapCreator.size + 2;
         Vector3 position = new Vector3((float)x, (float)y, 0) * tileSize;
@@ -216,12 +230,16 @@ public class GameManager : MonoBehaviour {
 
         var character = Instantiate(characterPrefab, position, Quaternion.identity);
         character.GetComponent<Character>().position = new Vector2(x, y);
+        character.GetComponent<Character>().SetColor(colorOptions[Random.Range(0, colorOptions.Length)]);
+        if (characters.Count == 0) { p1Icon = Instantiate(p1Icon, position + Vector3.up, Quaternion.identity, character.transform); }
+        if (characters.Count == 1) { p2Icon = Instantiate(p2Icon, position + Vector3.up, Quaternion.identity, character.transform); }
         characters.Add(character);
     }
 
     private void SpawnAmmo() {
-        int x = Random.Range(2, 8);
-        int y = Random.Range(2, 8);
+        Vector2 pos = GetSpawnPoint();
+        int x = (int)pos.x;
+        int y = (int)pos.y;
         Debug.Log("x: " + x + ",y: " + y);
         float tileSize = mapCreator.tileSize;
         float size = mapCreator.size + 2;

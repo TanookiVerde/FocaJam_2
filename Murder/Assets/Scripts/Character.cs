@@ -4,11 +4,13 @@ using UnityEngine;
 using DG.Tweening;
 
 public class Character : MonoBehaviour {
+    [SerializeField] private SpriteRenderer _sprite;
     [SerializeField] private SpriteRenderer bulletIcon;
     [SerializeField] private GameObject bulletObject;
 
     public Vector2 position;
     public bool hasBullet;
+
 
     private void Start() {
         SetAmmo(false);
@@ -38,6 +40,9 @@ public class Character : MonoBehaviour {
         }
         return randVec;
     }
+    public void SetColor(Color color) {
+        if (_sprite) _sprite.color = color;
+    }
     public void SetAmmo(bool value) {
         bulletIcon.enabled = value;
         hasBullet = value;
@@ -49,6 +54,9 @@ public class Character : MonoBehaviour {
         SetAmmo(false);
     }
     public void Die(){
-        Destroy(this.gameObject,0.5f);
+        GetComponent<Animator>().SetTrigger("die");
+    }
+    public void DisableRenderer() {
+        _sprite.enabled = false;
     }
 }
