@@ -163,7 +163,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7946e90fd2717540b259c208e9f73d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  charactersQuantity: 0
+  cpuPrefab: {fileID: 1761926649213520, guid: 58ffe7399ccb16743977737ea3bdbb37, type: 2}
   mapCreator: {fileID: 1560544809}
+  characters: []
 --- !u!4 &1539969295
 Transform:
   m_ObjectHideFlags: 0
@@ -204,11 +207,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8629477634875f498fe880c00b9ffb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  size: 8
+  mapData:
+  - {fileID: 11400000, guid: de50911c04018d349b49b50e6ae73127, type: 2}
+  - {fileID: 11400000, guid: 746608ee1b46806418725ce3aac9b4ae, type: 2}
   mapParent: {fileID: 319677814}
   tiles:
   - {fileID: 1947080215667326, guid: 729a1bfd43c7ca344986d530c3ad6b7d, type: 2}
-  cpuPrefab: {fileID: 1761926649213520, guid: 58ffe7399ccb16743977737ea3bdbb37, type: 2}
-  characters: []
+  - {fileID: 1947080215667326, guid: abfcecb5e48e8124b8f657d0b8e41cf5, type: 2}
+  tileSize: 0
+  currentMap: 0
 --- !u!4 &1560544810
 Transform:
   m_ObjectHideFlags: 0

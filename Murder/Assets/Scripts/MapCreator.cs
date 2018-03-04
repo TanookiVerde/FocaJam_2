@@ -4,50 +4,63 @@ using UnityEngine;
 
 public class MapCreator : MonoBehaviour {
 
-	const int size = 8;
-	private int[,] map  = {{0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0},
-						   {0,0,0,0,0,0,0,0}};
+	public const int totalSize = 10;
+	public int size = totalSize - 2;
+	public int[,] map  = {{1,1,1,1,1,1,1,1,1,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,0,0,0,0,0,0,0,0,1},
+						   {1,1,1,1,1,1,1,1,1,1}};
+	public List<MapData> mapData;
 	[SerializeField] private Transform mapParent;
 	[SerializeField] private List<GameObject> tiles;
+	public float tileSize;
 
-    [SerializeField] private GameObject cpuPrefab;
-    [HideInInspector] public List<GameObject> characters;
+	public int currentMap;
 
-	private void Awake(){
+	private void Start(){
+		tileSize = tiles[0].GetComponent<SpriteRenderer>().size.x;
+		ReadMapData();
 		InitializeMap();
-        InitializeCharacters();
-    }
-
+	}
+	private void ReadMapData(){
+		//Le o scriptable obj
+		foreach(Vector2 v in mapData[currentMap].obstacles){
+			map[(int) v.x,(int) v.y] = 1;
+		}
+	}
 	private void InitializeMap(){
-		float tileSize = tiles[0].GetComponent<SpriteRenderer>().size.x;
-		for(int y = 0; y < size; y++){
-			for(int x = 0; x < size; x++){
-				Vector3 position = new Vector3((float) x,(float) y, 0) * tileSize;
-				var go = Instantiate(tiles[0],position,Quaternion.identity);
-				go.transform.parent = mapParent;
+		//A partir da matriz map o metodo instancia os tiles. Ele centraliza a posicao de mapParente e também faz um efeito de xadrez com as cores
+		for(int y = 0; y < totalSize; y++){
+			for(int x = 0; x < totalSize; x++){
+				Vector2 position = new Vector2((float) x,(float) y)*tiles[0].GetComponent<SpriteRenderer>().size.x;
+				var go = CreateTile((TileType) map[x,y], position);
+				go.name = tiles[map[x,y]].name +" ("+x+","+y+")";
+				if(map[x,y] == TileType.EMPTY.GetHashCode()) SetColorByPosition(go.GetComponent<SpriteRenderer>(),x+y);
 			}
 		}
-		mapParent.transform.position -= new Vector3(size*tileSize - tileSize*0.5f, size*tileSize - tileSize,0) * 0.5f;
+		mapParent.transform.position -= new Vector3(totalSize*tileSize - tileSize*0.5f,totalSize*tileSize - tileSize,0)*0.5f;
 	}
-
-    private void InitializeCharacters(){
-        int x = 3, y = 3; //temp
-        float tileSize = tiles[0].GetComponent<SpriteRenderer>().size.x;
-        characters = new List<GameObject>();
-
-        Vector3 position = new Vector3((float)x, (float)y, 0) * tiles[0].GetComponent<SpriteRenderer>().size.x;
-        position -= new Vector3(size * tileSize - tileSize * 0.5f, size * tileSize - tileSize, 0) * 0.5f;
-        var character = Instantiate(cpuPrefab, position, Quaternion.identity);
-        characters.Add(character);
-    }
+	private GameObject CreateTile(TileType type, Vector2 position){
+		//Cria um tile de tipo type na posicao position. Tambem o coloca como filho de mapParent, para depois centralizar.
+		GameObject tile = tiles[type.GetHashCode()];
+		var go = Instantiate(tile,position,Quaternion.identity);
+		go.transform.parent = mapParent;
+		return go; 
+	}
+	private void SetColorByPosition(SpriteRenderer sprite, int posSum){
+		//Muda a cor baseado na soma das coordenadas. Se for par pinta de cinza. Impar fica branco.
+		sprite.color = Color.white;
+		if(posSum % 2 == 0){
+			sprite.color = Color.gray;
+		}
+	}
 }
-
-public enum MoveDirection {
-    Up, Down, Right, Left
+public enum TileType{
+	EMPTY,WALL
 }

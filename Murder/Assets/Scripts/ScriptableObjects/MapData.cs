@@ -2,5 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapData : MonoBehaviour {
+[CreateAssetMenu(menuName="Custom/MapData")]
+public class MapData : ScriptableObject {
+    public List<Vector2> obstacles;
 }
