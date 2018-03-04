@@ -38,16 +38,17 @@ public class Character : MonoBehaviour {
         }
         return randVec;
     }
-
     public void SetAmmo(bool value) {
         bulletIcon.enabled = value;
         hasBullet = value;
     }
-
     public void ShootBullet(Vector3 direction) {
         bulletObject.SetActive(true);
         bulletObject.transform.rotation = Quaternion.Euler(0, 0, -Vector2.Angle(direction, Vector2.up));
         bulletObject.transform.DOMove(bulletObject.transform.position + (direction * 20), 2);
         SetAmmo(false);
+    }
+    public void Die(){
+        Destroy(this.gameObject,0.5f);
     }
 }

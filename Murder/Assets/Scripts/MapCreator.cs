@@ -26,29 +26,40 @@ public class MapCreator : MonoBehaviour {
 
 	private void Start(){
 		tileSize = tiles[0].GetComponent<SpriteRenderer>().size.x;
-		ReadMapData();
-		InitializeMap();
 	}
-	private void ReadMapData(){
-		//Le o scriptable obj
-		foreach(Vector2 v in mapData[currentMap].obstacles){
-			map[(int) v.x,(int) v.y] = 1;
-		}
-	}
-	private void InitializeMap(){
-		//A partir da matriz map o metodo instancia os tiles. Ele centraliza a posicao de mapParente e também faz um efeito de xadrez com as cores
-		for(int y = 0; y < totalSize; y++){
-			for(int x = 0; x < totalSize; x++){
-				Vector2 position = new Vector2((float) x,(float) y)*tiles[0].GetComponent<SpriteRenderer>().size.x;
-				var go = CreateTile((TileType) map[x,y], position);
-				go.name = tiles[map[x,y]].name +" ("+x+","+y+")";
-				if(map[x,y] == TileType.EMPTY.GetHashCode()) SetColorByPosition(go.GetComponent<SpriteRenderer>(),x+y);
+	public void ReadMapData(int i){
+		currentMap = i;
+        //Le o scriptable obj
+        foreach(MapData.Obstacle obstacle in mapData[currentMap].obstacles){
+            int x = (int)obstacle.position.x, y = (int)obstacle.position.y;
+            map[(int)x,(int)y] = 1;
+            Vector2 position = new Vector2((float)x, (float)y) * tiles[0].GetComponent<SpriteRenderer>().size.x;
+            var go = CreateTile((TileType)1, position);
+            go.name = tiles[map[x,y]].name +" ("+x+","+y+")";
+            SetOrdingLayerByPosition(go.GetComponent<SpriteRenderer>(), y, totalSize);
+            go.GetComponent<SpriteRenderer>().sprite = obstacle.sprite;
+            if (obstacle.mirrored) go.transform.Rotate(Vector2.up * 180);
+        }
+    }
+    public void InitializeMap(){
+        //A partir da matriz map o metodo instancia os tiles. Ele centraliza a posicao de mapParente e também faz um efeito de xadrez com as cores
+        for(int y = 0; y < totalSize; y++){
+            for(int x = 0; x < totalSize; x++){
+                int tileIndex = map[x,y];
+                Vector2 position = new Vector2((float) x,(float) y)*tiles[0].GetComponent<SpriteRenderer>().size.x;
+                GameObject go = CreateTile(0, position);
+                go.name = tiles[map[x,y]].name +" ("+x+","+y+")";
+                /*if(map[x,y] == TileType.EMPTY.GetHashCode())*/ SetColorByPosition(go.GetComponent<SpriteRenderer>(),x+y);
                 SetOrdingLayerByPosition(go.GetComponent<SpriteRenderer>(), y, totalSize);
-
+                if (x == 0 || y == 0 || x == totalSize - 1 || y == totalSize - 1) {
+                    //jesus cristo
+                    GameObject wall = CreateTile((TileType)1, position);
+                    SetOrdingLayerByPosition(wall.GetComponent<SpriteRenderer>(), y, totalSize);
+                }
             }
-		}
-		mapParent.transform.position -= new Vector3(totalSize*tileSize - tileSize*0.5f,totalSize*tileSize - tileSize,0)*0.5f;
-	}
+        }
+        mapParent.transform.position -= new Vector3(totalSize*tileSize - tileSize*0.5f,totalSize*tileSize - tileSize,0)*0.5f;
+    }
 	private GameObject CreateTile(TileType type, Vector2 position){
 		//Cria um tile de tipo type na posicao position. Tambem o coloca como filho de mapParent, para depois centralizar.
 		GameObject tile = tiles[type.GetHashCode()];

@@ -13,25 +13,21 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private MapCreator mapCreator;
     [SerializeField] private List<GameObject> characters = new List<GameObject>();
     [SerializeField] private List<GameObject> ammos = new List<GameObject>();
+    [SerializeField] private GameData gameData;
+
     private Dictionary<Vector2,GameObject> nextPositions = new Dictionary<Vector2, GameObject>();
     [SerializeField] private bool[] shallShoot;
     private Vector2[] shootDirection;
 
     [SerializeField] private Text gameState;
 
-    bool ended;
+    private bool ended;
+    private int currentRound;
+    private int[] playersScore = {0,0};
 
 	void Start () {
-        shallShoot = new bool[playerQuantity];
-        shootDirection = new Vector2[playerQuantity];
-
-        InitializeCharacters();
-        InitializeCharacters();
-        InitializeCharacters();
-
-        SpawnAmmo();
-        SpawnAmmo();
-
+        mapCreator.ReadMapData(gameData.mapNumber);
+		mapCreator.InitializeMap();
         StartCoroutine(GameLoop());
     }
     private void Update() {
@@ -40,21 +36,54 @@ public class GameManager : MonoBehaviour {
             characters[1].GetComponent<SpriteRenderer>().color = Color.red;
         }
     }
+    private void InitializeRound(){
+        for(int i = characters.Count-1; i > 0; i--){
+            Destroy(characters[i]);
+        }
+        characters = new List<GameObject>();
+        InitializeCharacters();
+        InitializeCharacters();
+        InitializeCharacters();
+        InitializeCharacters();
 
+        shallShoot = new bool[playerQuantity];
+        shootDirection = new Vector2[playerQuantity];
+
+        SpawnAmmo();
+        SpawnAmmo();
+    }
     private IEnumerator GameLoop(){
-        while(!ended){
-            nextPositions.Clear();
-            AddObstaclesInDictionary();
-            RandomizeCharactersMovement();
-            yield return WaitForPlayerInput(0);
-            yield return WaitForPlayerInput(1);
-            if (isMurderTime()) {
-                ShootBullets();
-                ended = true;
-            } else {
-                yield return NewPositionsHandler();
-                yield return new WaitForEndOfFrame();
+        int rounds = 1;
+        if(gameData.rounds == RoundQuantity.THREE){
+            rounds = 3;
+        } if(gameData.rounds == RoundQuantity.FIVE){
+            rounds = 5;
+        }
+        for(currentRound = 0; currentRound < rounds; currentRound++){
+            ended = false;
+            InitializeRound();
+            print("Round "+(currentRound+1).ToString());
+            print("Max Round "+rounds);
+            if(playersScore[0] > (float)rounds/2 || playersScore[1] > (float)rounds/2){
+                //animacao final
+                yield break;
             }
+            //animacao inicio round
+            while(!ended){
+                nextPositions.Clear();
+                AddObstaclesInDictionary();
+                RandomizeCharactersMovement();
+                yield return WaitForPlayerInput(0);
+                yield return WaitForPlayerInput(1);
+                if (isMurderTime()) {
+                    ShootBullets();
+                    ended = true;
+                } else {
+                    yield return NewPositionsHandler();
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+            //animacao final rounds - com ganhador
         }
     }
     private IEnumerator WaitForPlayerInput(int playerId){
@@ -140,10 +169,14 @@ public class GameManager : MonoBehaviour {
         Vector2 bulletPos = startPos;
         for(int i = 0; i < mapCreator.size && !hit; i++) {
             bulletPos += direction;
-            foreach(GameObject go in characters) {
+            for(int j = 0; j < characters.Count; j++){
                 Debug.Log("bulletPos: " + bulletPos);
-                if (bulletPos == go.GetComponent<Character>().position) {
-                    Destroy(go);
+                if (bulletPos == characters[j].GetComponent<Character>().position) {
+                    characters[j].GetComponent<Character>().Die();
+                    if(j <= 2){
+                        playersScore[j]++;
+                        print("Player Ganho!!!");
+                    }
                     hit = true;
                     break;
                 }

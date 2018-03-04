@@ -12,5 +12,36 @@ MonoBehaviour:
   m_Name: test_map 2
   m_EditorClassIdentifier: 
   obstacles:
-  - {x: 0, y: 6}
-  - {x: 6, y: 6}
+  - position: {x: 3, y: 3}
+    sprite: {fileID: 21300012, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 1
+  - position: {x: 4, y: 3}
+    sprite: {fileID: 21300006, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 1
+  - position: {x: 5, y: 3}
+    sprite: {fileID: 21300006, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 6, y: 3}
+    sprite: {fileID: 21300012, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 1, y: 8}
+    sprite: {fileID: 21300002, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 2, y: 8}
+    sprite: {fileID: 21300002, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 1, y: 7}
+    sprite: {fileID: 21300000, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 3, y: 6}
+    sprite: {fileID: 21300012, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 1
+  - position: {x: 4, y: 6}
+    sprite: {fileID: 21300006, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 1
+  - position: {x: 5, y: 6}
+    sprite: {fileID: 21300006, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0
+  - position: {x: 6, y: 6}
+    sprite: {fileID: 21300012, guid: 6551cc11bdb2d224ca5b93cb35b412cc, type: 3}
+    mirrored: 0

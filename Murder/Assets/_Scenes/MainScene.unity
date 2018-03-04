@@ -170,6 +170,7 @@ MonoBehaviour:
   mapCreator: {fileID: 1560544809}
   characters: []
   ammos: []
+  gameData: {fileID: 11400000, guid: b6893a188f1c81a438382fd895d991c2, type: 2}
   shallShoot: 
   gameState: {fileID: 1836445786}
 --- !u!4 &1539969295
@@ -216,6 +217,7 @@ MonoBehaviour:
   mapData:
   - {fileID: 11400000, guid: de50911c04018d349b49b50e6ae73127, type: 2}
   - {fileID: 11400000, guid: 746608ee1b46806418725ce3aac9b4ae, type: 2}
+  - {fileID: 11400000, guid: b933f1f268ee0be4aade2d21ec2e78dc, type: 2}
   mapParent: {fileID: 319677814}
   tiles:
   - {fileID: 1947080215667326, guid: 729a1bfd43c7ca344986d530c3ad6b7d, type: 2}
